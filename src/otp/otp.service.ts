@@ -22,7 +22,7 @@ export class OtpService {
   }
 
   findOne(code: number): Promise<OTP | null> {
-    return this.otpRepository.findOneBy({ code });
+    return this.otpRepository.findOneBy({ code:code });
   }
 
   insertOne(code: number){
