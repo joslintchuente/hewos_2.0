@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +12,15 @@ import { User } from './user/user.entity';
 import { AuthService } from './authentication/auth.service';
 import { UserService } from './user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { OfferService } from './offer/offer.service';
+import { QuestionService } from './question/question.service';
+import { Offre as Offer } from './offer/offer.entity';
+import { OfferModule } from './offer/offer.module';
+import { QuestionModule } from './question/question.module';
+import { Question } from './question/question.entity';
+
+
+
 
 
 @Module({
@@ -23,14 +32,24 @@ import { JwtService } from '@nestjs/jwt';
       username: 'root',
       password: process.env.PASSWORD,
       database: 'hewos',
-      entities: [OTP,User],
+      entities: [OTP,User,Offer,Question],
       synchronize: Boolean(process.env.SYNCHRONIZE_DEV),
       
-    }), OtpModule , ScheduleModule.forRoot(),UserModule
+    }),
+    OtpModule, 
+    ScheduleModule.forRoot(),
+    UserModule,
+    OfferModule,
+    QuestionModule
   ],
   controllers: [AppController],
-  providers: [AppService,OtpService,AuthService,UserModule,UserService,JwtService],
+  providers: [AppService,OtpService,AuthService,UserModule,UserService,JwtService,OfferService,QuestionService],
 })
-export class AppModule {
+export class AppModule implements NestModule  {
   constructor(private dataSource: DataSource) {}
+  
+  configure(consumer: MiddlewareConsumer) {
+    //consumer.apply(AuthService).forRoutes('publier');
+  }
+  
 }

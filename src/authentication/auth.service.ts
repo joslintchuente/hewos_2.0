@@ -1,11 +1,13 @@
-import { Injectable, UnauthorizedException ,PreconditionFailedException} from '@nestjs/common';
+import { Injectable, UnauthorizedException ,PreconditionFailedException, NestMiddleware} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt'; 
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
+import { Request, Response, NextFunction } from 'express';
 const JWT_SIGN_SECRET = 'bliaeue15zpq1xz7saa97saszdeeeoc1187ed9z39j7o1z8zex'
 
 @Injectable()
 export class AuthService {
+
   constructor(private userService: UserService,private jwtService: JwtService) {}
 
   async signIn(telephone: number, pass: string): Promise<any> {
@@ -38,6 +40,10 @@ export class AuthService {
     const payload = { id: user.id_user, nom: user.nom };
     return await this.jwtService.signAsync(payload,{expiresIn: '24h',privateKey: JWT_SIGN_SECRET});
   }
+
+  
+  
+  
 
   
 }
