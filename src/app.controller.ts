@@ -143,18 +143,16 @@ export class AppController {
     
   }
 
-  // Here it have a Upload file problem
-  // TODO : Question management for question mode , Error Handling and Exception , file management and storage , 
-  //        destination and filename in DB
+  // Endpoint for publicate
   @Post('publier')
   @UseInterceptors(
     FileInterceptor('photo',{
       storage : diskStorage({
         destination : function (req, file, cb) {
-          cb(null, './public/images')
+          cb(null, './public/images/temp')
         },
         filename : (req,file,cb) => {
-          cb(null,file.originalname + Date.now())
+          cb(null, ''+Date.now()+'_'+file.originalname)
         }
       })
     }),
@@ -162,29 +160,30 @@ export class AppController {
   )
   async publicate(@UploadedFile() file: Express.Multer.File, @Body(new ValidationPipe()) offer:offerDto, @Res() res : Response ){
 
-    console.log(offer,"-------------");
-    console.log(file);
-    
-
-
-
-
-
-    
-    
     try{
       
       this.offerService.insertOne(offer,file).then((query)=>{
-        console.log(query.identifiers[0].id_offre);
-        
         
         if(offer.mode === "question"){
           let questions : string[] = offer.questions.split("*");
           questions.forEach(element => {
-            console.log(element);
-            this.questionService.insertOne(element,query.identifiers[0].id_offre);
+            
+            this.questionService.insertOne(element,query.identifiers[0].id_offre).catch((e)=>{
+              console.error(e);
+              res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                message : 'Erreur lors de prise des questions :' + e
+              });
+            });
           });
         }
+        this.offerService.stockerFichier(file,offer.id_user,query.identifiers[0].id_offre).catch((e)=>{
+          console.error(e);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            message : 'Erreur lors de la reception des images :' + e
+          });
+        });
+
+
         res.status(HttpStatus.CREATED).json({
           message: "publication reussie !"
         });

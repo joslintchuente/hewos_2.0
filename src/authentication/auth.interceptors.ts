@@ -20,7 +20,6 @@ export class AuthInterceptor<T> implements NestInterceptor<T, Response<T>> {
     let req = context.switchToHttp().getRequest();
     
     this.tokenVerification(req.body.token).then((data) =>  {
-      console.log("les donnees du token: ",data);
       req.body.id_user = data.id;
     }).catch((reason)=>{
       console.log("Authentication error . Invalid token !",reason);
