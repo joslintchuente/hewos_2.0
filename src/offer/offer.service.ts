@@ -19,6 +19,7 @@ export class OfferService {
     ) {}
 
     findAll(): Promise<Offer[]> {
+        //this.offerRepository.createQueryBuilder('e').orderBy('RANDOM()').limit(7)..getMany()
         return this.offerRepository.find();
     }
 

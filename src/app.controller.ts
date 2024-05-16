@@ -15,8 +15,8 @@ import { offerDto } from './offer/offerDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthInterceptor } from './authentication/auth.interceptors';
 import { diskStorage } from 'multer';
-import * as fs from 'node:fs/promises';
-import { date } from 'zod';
+import { SelectionCriteria } from './offer/offer.criteria';
+import { Observable, interval, map } from 'rxjs';
 
 @Controller('')
 export class AppController {
@@ -204,11 +204,31 @@ export class AppController {
   }
 
 /*
+  TODO : 
+      - afficher les publications
+      - les trier (nombre limite de pub , algorithme de recommandation, Hazard , facteur anciennete  )
+      - Envoie de notifications de publications, de messages, de postes , likes , commentaires , d'evenements*/
+      /*
   @Sse('publications')
   sse(): Observable<MessageEvent> {
-    return interval(1000).pipe(map((_) => ({ data: { hello: 'world' } })));
-  }
-  */
+    let offServ = this.offerService;
+    let selCri : SelectionCriteria; 
+    const observable = new Observable(function subscribe(subscriber) {
+      
+      try {
+        //listing of criteria to match
+        //selCri.
+        offServ.findOne();
+        subscriber.next(1);
+        subscriber.next(2);
+        subscriber.next(3);
+        subscriber.complete();
+      } catch (err) {
+        subscriber.error(err); // delivers an error if it caught one
+      }
+    });
+  }*/
+  
 
 
 }
