@@ -209,7 +209,9 @@ export class AppController {
       - les trier (nombre limite de pub , algorithme de recommandation, Hazard , facteur anciennete  )
       - Envoie de notifications de publications, de messages, de postes , likes , commentaires , d'evenements*/
       /*
+  
   @Sse('publications')
+  @UseInterceptors(AuthInterceptor)
   sse(): Observable<MessageEvent> {
     let offServ = this.offerService;
     let selCri : SelectionCriteria; 
@@ -229,6 +231,24 @@ export class AppController {
     });
   }*/
   
+  @Get('publications')
+  @UseInterceptors(AuthInterceptor)
+  async send_publications(@Body(new ValidationPipe()) reqst, @Res() res : Response){
+    let offServ = this.offerService;
+
+    offServ.findMany(reqst).then((result)=>{
+      res.status(HttpStatus.FOUND).json({
+        data: result[0],
+        message: 'Recuperation de '+ result[1] +' publications !'
+      });
+
+    }).catch((e)=>{
+      console.error(e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : 'Erreur lors de la recuperation des publications :' + e
+      });
+    });
+  }
 
 
 }

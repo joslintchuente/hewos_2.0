@@ -8,5 +8,8 @@ export interface SelectionCriteria {
     date_publication?: Date,
     delai?: Date,
     photo?: string,
+    likes?: number,
+    postulants?: number,
+    statut_offre?: string,
 
 }

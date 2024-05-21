@@ -1,5 +1,5 @@
 
-import { Injectable,  Logger } from '@nestjs/common';
+import { Body, Injectable,  Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { Offre as Offer } from './offer.entity';
@@ -21,6 +21,17 @@ export class OfferService {
     findAll(): Promise<Offer[]> {
         //this.offerRepository.createQueryBuilder('e').orderBy('RANDOM()').limit(7)..getMany()
         return this.offerRepository.find();
+    }
+    findMany(@Body() body :any,criteria?: SelectionCriteria):  Promise<any> {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+
+        //let off = this.offerRepository.createQueryBuilder('e').orderBy('RANDOM()').limit(7).getMany();
+        let off = this.offerRepository.createQueryBuilder('e').orderBy('RANDOM()').where('e.date_publication > :threeMonthsAgo', { threeMonthsAgo })
+        .andWhere("e.id_user != :id", { id: body.id_user }).limit(10).getManyAndCount();
+        
+        return off;
     }
 
     findOne(Criteria: SelectionCriteria): Promise<Offer | null> {
