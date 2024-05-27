@@ -11,7 +11,7 @@ export class AuthService {
   constructor(private userService: UserService,private jwtService: JwtService) {}
 
   async signIn(telephone: number, pass: string): Promise<any> {
-    const user = await this.userService.findOne(telephone);
+    const user = await this.userService.findOne({telephone:telephone});
     if (!bcrypt.compareSync(pass, user.mot_passe)) {
       throw new UnauthorizedException();
     }
@@ -26,7 +26,7 @@ export class AuthService {
 
   // verification of user existence
   async signUp(telephone: number):Promise<Boolean>{
-    const user = await this.userService.findOne(telephone);
+    const user = await this.userService.findOne({telephone:telephone});
     if(user){
         throw new PreconditionFailedException({message: "Precondition Failed , User already exist !"});
     }else{
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   async generateToken(telephone: number){
-    const user = await this.userService.findOne(telephone);
+    const user = await this.userService.findOne({telephone:telephone});
     const { mot_passe, ...result } = user;
     const payload = { id: user.id_user, nom: user.nom };
     return await this.jwtService.signAsync(payload,{expiresIn: '24h',privateKey: JWT_SIGN_SECRET});

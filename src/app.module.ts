@@ -18,6 +18,10 @@ import { Offre as Offer } from './offer/offer.entity';
 import { OfferModule } from './offer/offer.module';
 import { QuestionModule } from './question/question.module';
 import { Question } from './question/question.entity';
+import { CommentaireModule } from './commentaire/commentaire.module';
+import { CommentaireService } from './commentaire/commentaire.service';
+import { Commentaire } from './commentaire/commentaire.entity';
+import { LoggerMiddleware } from './middleware/Logger.Middleware';
 
 
 
@@ -32,7 +36,7 @@ import { Question } from './question/question.entity';
       username: 'root',
       password: process.env.PASSWORD,
       database: 'hewos',
-      entities: [OTP,User,Offer,Question],
+      entities: [OTP,User,Offer,Question,Commentaire],
       synchronize: Boolean(process.env.SYNCHRONIZE_DEV),
       
     }),
@@ -40,16 +44,19 @@ import { Question } from './question/question.entity';
     ScheduleModule.forRoot(),
     UserModule,
     OfferModule,
-    QuestionModule
+    QuestionModule,
+    CommentaireModule
   ],
   controllers: [AppController],
-  providers: [AppService,OtpService,AuthService,UserModule,UserService,JwtService,OfferService,QuestionService],
+  providers: [AppService,OtpService,AuthService,UserModule,UserService,JwtService,OfferService,QuestionService,CommentaireService],
 })
 export class AppModule implements NestModule  {
   constructor(private dataSource: DataSource) {}
   
   configure(consumer: MiddlewareConsumer) {
-    //consumer.apply(AuthService).forRoutes('publier');
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('*');
   }
   
 }

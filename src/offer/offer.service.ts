@@ -1,7 +1,7 @@
 
 import { Body, Injectable,  Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { InsertResult, Repository, UpdateResult } from 'typeorm';
 import { Offre as Offer } from './offer.entity';
 import { offerDto } from './offerDto';
 import { SelectionCriteria } from './offer.criteria';
@@ -23,13 +23,12 @@ export class OfferService {
         return this.offerRepository.find();
     }
     findMany(@Body() body :any,criteria?: SelectionCriteria):  Promise<any> {
-        const threeMonthsAgo = new Date();
+        const threeMonthsAgo = new Date(); // Définir la date correspondant à trois mois auparavant
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
 
-        //let off = this.offerRepository.createQueryBuilder('e').orderBy('RANDOM()').limit(7).getMany();
-        let off = this.offerRepository.createQueryBuilder('e').orderBy('RANDOM()').where('e.date_publication > :threeMonthsAgo', { threeMonthsAgo })
-        .andWhere("e.id_user != :id", { id: body.id_user }).limit(10).getManyAndCount();
+        //let off = this.offerRepository.createQueryBuilder('e').orderBy('RAND()').limit(7).getMany();to_char(offre.date_publication, 'YYYY-MM-DD HH24:MI:SS.US')
+        let off = this.offerRepository.createQueryBuilder('offre').orderBy('RAND()').where("offre.date_publication > :threeMonthsAgo", { threeMonthsAgo }).andWhere("offre.id_user != :id", { id: body.id_user }).limit(10).getManyAndCount();
         
         return off;
     }
@@ -101,6 +100,29 @@ export class OfferService {
             
             
         });
+    }
+
+    async updateLikes(@Body() body :any):Promise<UpdateResult>{
+        let offres = await this.findOne({id_offre:body.id_offre});
+        
+        return this.offerRepository.update(body.id_offre , {likes : offres.likes + 1 });
+        
+        
+    }
+    async updateCom(@Body() body :any):Promise<UpdateResult>{
+        let offres = await this.findOne({id_offre:body.id_offre});
+        
+        return this.offerRepository.update(body.id_offre , {likes : offres.commentaires + 1 });
+        
+        
+    }
+    async updateComExt(id_offre:number):Promise<UpdateResult>{
+
+        let offres = await this.findOne({id_offre:id_offre});
+
+        return this.offerRepository.update(id_offre , {likes : offres.commentaires + 1 });
+        
+        
     }
 
 }

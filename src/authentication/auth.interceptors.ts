@@ -25,7 +25,7 @@ export class AuthInterceptor<T> implements NestInterceptor<T, Response<T>> {
       console.log("Authentication error . Invalid token !",reason);
     });
 
-    
+
     return next.handle().pipe(map(data => ({ data })));
   }
 

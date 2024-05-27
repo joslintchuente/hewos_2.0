@@ -33,6 +33,15 @@ export class Offre {
 
     @Column()
     photo_post?: string;
+
+    @Column()
+    likes?: number;
+
+    @Column()
+    commentaires?: number;
+
+    @Column()
+    postulants?: number;
     
 
 

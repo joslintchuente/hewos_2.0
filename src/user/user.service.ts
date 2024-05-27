@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { userDto } from './userDto';
 import * as bcrypt from 'bcrypt';
+import { userCriteria } from './user.criteria';
 
 @Injectable()
 export class UserService {
@@ -19,8 +20,8 @@ export class UserService {
         return this.userRepository.find();
     }
 
-    findOne(telephone: number): Promise<User | null> {
-        return this.userRepository.findOneBy({ telephone : telephone });
+    findOne(usercriteria:userCriteria): Promise<User | null> {
+        return this.userRepository.findOneBy(usercriteria);
     }
 
     async insertOne(userdto : userDto){

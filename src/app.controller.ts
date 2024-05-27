@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Req, Res, HttpStatus, Body, Sse, Next, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, HttpStatus, Body, Sse, Next, UseInterceptors, UploadedFile, Put } from '@nestjs/common';
 import { AppService } from './app.service';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { OtpService } from './otp/otp.service';
 import { CronTime } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -15,8 +15,9 @@ import { offerDto } from './offer/offerDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthInterceptor } from './authentication/auth.interceptors';
 import { diskStorage } from 'multer';
-import { SelectionCriteria } from './offer/offer.criteria';
-import { Observable, interval, map } from 'rxjs';
+import { commentaireDto } from './commentaire/commentaireDto';
+import { commentaireDto2 } from './commentaire/commentaireDto2';
+import { CommentaireService } from './commentaire/commentaire.service';
 
 @Controller('')
 export class AppController {
@@ -27,6 +28,7 @@ export class AppController {
     private authService : AuthService,
     private offerService : OfferService,
     private questionService : QuestionService,
+    private commentaireService : CommentaireService,
     private schedulerRegistry: SchedulerRegistry) {}
 
   @Get()
@@ -249,6 +251,59 @@ export class AppController {
       });
     });
   }
+
+  @Put('likes_publications')
+  @UseInterceptors(AuthInterceptor)
+  async likes(@Body(new ValidationPipe()) reqst, @Res() res : Response){
+    this.offerService.updateLikes(reqst).then((result)=>{
+      res.status(HttpStatus.CREATED).json({
+        message: "publication likee !"
+      });
+    }).catch((e)=>{
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur lors du like de la publication : "+e
+      });
+    });
+  }
+
+  @Post('commentaires')
+  @UseInterceptors(AuthInterceptor)
+  async commenter(@Body(new ValidationPipe()) body: commentaireDto, @Res() res : Response){
+    
+    this.commentaireService.insertOne(body).then((result)=>{
+      res.status(HttpStatus.CREATED).json({
+              message: "Commentaire envoye !"
+            });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur lors du commentaire de la publication : "+e
+      });
+    });
+    
+  }
+
+  @Get('listes_commentaires')
+  @UseInterceptors(AuthInterceptor)
+  async get_comments(@Body(new ValidationPipe()) body: commentaireDto2, @Res() res : Response){
+    this.commentaireService.findMany(body).then((result)=>{
+      res.status(HttpStatus.FOUND).json({
+        message: 'Recuperation de 7/'+ result[1] +' commentaires !',
+        data: result[0],
+        nbr_publications: result[1]
+      });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur de recuperation des commentaires : "+e
+      });
+    });
+  }
+
+
+
+
+  
 
 
 }

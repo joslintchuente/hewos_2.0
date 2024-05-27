@@ -1,5 +1,6 @@
 import { IsString } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Commentaire } from 'src/commentaire/commentaire.entity';
 
 @Entity()
 export class User {
