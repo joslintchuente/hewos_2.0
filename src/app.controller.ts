@@ -5,6 +5,7 @@ import { OtpService } from './otp/otp.service';
 import { CronTime } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { userDto } from './user/userDto';
+import { userDto2 } from './user/userDto2';
 import { ValidationPipe } from '@nestjs/common';
 import { UserService } from './user/user.service';
 import { AuthService } from './authentication/auth.service';
@@ -18,6 +19,11 @@ import { diskStorage } from 'multer';
 import { commentaireDto } from './commentaire/commentaireDto';
 import { commentaireDto2 } from './commentaire/commentaireDto2';
 import { CommentaireService } from './commentaire/commentaire.service';
+import { postulatDto } from './postulat/postulatDto';
+import { postulatDto2 } from './postulat/postulatDto2';
+import { PostulatService } from './postulat/postulat.service';
+import { abonnementDto } from './abonnement/abonnementDto';
+import { AbonnementService } from './abonnement/abonnement.service';
 
 @Controller('')
 export class AppController {
@@ -29,6 +35,8 @@ export class AppController {
     private offerService : OfferService,
     private questionService : QuestionService,
     private commentaireService : CommentaireService,
+    private postulatService : PostulatService,
+    private abonnementService : AbonnementService,
     private schedulerRegistry: SchedulerRegistry) {}
 
   @Get()
@@ -290,7 +298,7 @@ export class AppController {
       res.status(HttpStatus.FOUND).json({
         message: 'Recuperation de 7/'+ result[1] +' commentaires !',
         data: result[0],
-        nbr_publications: result[1]
+        nbr_commentaires: result[1]
       });
     }).catch((e)=>{
       
@@ -300,10 +308,65 @@ export class AppController {
     });
   }
 
+  @Post('postulat')
+  @UseInterceptors(AuthInterceptor)
+  async postuler(@Body(new ValidationPipe()) body: postulatDto, @Res() res : Response){
+    this.postulatService.insertOne(body).then((result)=>{
+      res.status(HttpStatus.CREATED).json({
+        message: 'postulat fait!'
+      });
+    }).catch((e)=>{
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur lors du postulat a cet offre : "+e
+      });
+    });
+  }
 
+  @Get('postulants')
+  @UseInterceptors(AuthInterceptor)
+  async lister_postulants(@Body(new ValidationPipe()) body: postulatDto2, @Res() res : Response){
+    this.postulatService.findMany(body.id_offre).then((result)=>{
+      res.status(HttpStatus.FOUND).json({
+        message: 'Recuperation de '+ result[1] +' profil(s) de postulant(s) !',
+        data: result[0],
+        nbr_postulants: result[1]
+      });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur de recuperation des commentaires : "+e
+      });
+    });
+  }
 
+  @Post('souscrire')
+  @UseInterceptors(AuthInterceptor)
+  async abonner(@Body(new ValidationPipe()) body: abonnementDto, @Res() res : Response){
+    this.abonnementService.insertOne(body).then((result)=>{
+      res.status(HttpStatus.ACCEPTED).json({
+        message: 'Abonnement reussi !'
+      });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur lors de l'abonnement : "+e
+      });
+    });
+  }    
 
-  
-
+  @Put('profil')
+  @UseInterceptors(AuthInterceptor)
+  async modifier_profil(@Body(new ValidationPipe()) body: userDto2, @Res() res : Response){
+    this.userService.update(body).then(()=>{
+      res.status(HttpStatus.ACCEPTED).json({
+        message: 'Mis a jour du profil reussi !'
+      });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Echec de mis a jour du profil : "+e
+      });
+    });
+  }
 
 }

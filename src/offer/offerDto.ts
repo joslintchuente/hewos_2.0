@@ -29,7 +29,6 @@ export class offerDto{
     description: string;
 
     @IsCustomDateFormat()
-    @IsNotEmpty()
     delai: Date;
 
     
@@ -37,7 +36,6 @@ export class offerDto{
 
     @IsString()
     @MinLength(3)
-    @IsNotEmpty()
     questions?: string; // formatted as : "question1*question2*question3*..."
 
 }

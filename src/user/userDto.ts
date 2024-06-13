@@ -1,5 +1,5 @@
 
-import { IsString, IsInt , IsPhoneNumber, IsEmail, IsStrongPassword, MaxLength, MinLength, IsDate, IsNotEmpty, IsNumberString, IsDateString } from 'class-validator';
+import { IsOptional,IsString, IsInt , IsPhoneNumber, IsEmail, IsStrongPassword, MaxLength, MinLength, IsDate, IsNotEmpty, IsNumberString, IsDateString } from 'class-validator';
 import { IsCustomDateFormat } from 'src/validation/CustomDateFormat';
 
 export class userDto{
@@ -54,6 +54,7 @@ export class userDto{
     date_naissance: Date;
 
     @IsNotEmpty()
+    @IsOptional()
     photo?: string;
 
 }

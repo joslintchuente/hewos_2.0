@@ -112,7 +112,7 @@ export class OfferService {
     async updateCom(@Body() body :any):Promise<UpdateResult>{
         let offres = await this.findOne({id_offre:body.id_offre});
         
-        return this.offerRepository.update(body.id_offre , {likes : offres.commentaires + 1 });
+        return this.offerRepository.update(body.id_offre , {commentaires : offres.commentaires + 1 });
         
         
     }
@@ -120,7 +120,14 @@ export class OfferService {
 
         let offres = await this.findOne({id_offre:id_offre});
 
-        return this.offerRepository.update(id_offre , {likes : offres.commentaires + 1 });
+        return this.offerRepository.update(id_offre , {commentaires : offres.commentaires + 1 });
+        
+        
+    }
+    async updatePostulants(@Body() body :any):Promise<UpdateResult>{
+        let offres = await this.findOne({id_offre:body.id_offre});
+        
+        return this.offerRepository.update(body.id_offre , {postulants : offres.postulants + 1 });
         
         
     }

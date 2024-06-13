@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { userDto } from './userDto';
 import * as bcrypt from 'bcrypt';
 import { userCriteria } from './user.criteria';
+import { userDto2 } from './userDto2';
 
 @Injectable()
 export class UserService {
@@ -50,6 +51,21 @@ export class UserService {
 
     async remove(telephone: number): Promise<void> {
         await this.userRepository.delete(telephone);
+    }
+
+    async update(userdto : userDto2){
+        return await this.userRepository.update(userdto.id_user,
+            {
+                nom : userdto.nom,
+                prenom: userdto.prenom,
+                telephone:userdto.telephone,
+                email: userdto.email,
+                id_pays:userdto.id_pays ,
+                monnaie: userdto.monnaie,
+                profession:userdto.profession,
+                ville: userdto.ville,
+                date_naissance:userdto.ville
+            });
     }
 
 
