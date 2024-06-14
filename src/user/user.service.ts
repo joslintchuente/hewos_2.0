@@ -1,5 +1,5 @@
 
-import { Injectable,  Logger } from '@nestjs/common';
+import { Body,Injectable,  Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -7,6 +7,8 @@ import { userDto } from './userDto';
 import * as bcrypt from 'bcrypt';
 import { userCriteria } from './user.criteria';
 import { userDto2 } from './userDto2';
+import * as fs from 'node:fs/promises';
+import * as path from 'path';
 
 @Injectable()
 export class UserService {
@@ -66,6 +68,48 @@ export class UserService {
                 ville: userdto.ville,
                 date_naissance:userdto.ville
             });
+    }
+
+    async update_image(@Body() body :any, photo: Express.Multer.File){
+        return await this.userRepository.update(body.id_user,
+            {
+                photo:photo.filename
+            });
+    }
+
+    async storage_image(file: Express.Multer.File, id_user: number): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            fs.mkdir('public/images/user/user_' + id_user).catch((e)=>{
+                if (e.code !== "EEXIST") throw e;
+            });
+            fs.mkdir('public/images/user/user_' + id_user + '/profil').then(()=>{
+                const cheminDestination = path.join('public/images/user/user_' + id_user + '/profil', file.filename);
+        
+                // Déplacer le fichier vers le dossier de destination
+                fs.cp(file.path, cheminDestination).then(() => {
+                    fs.rm(file.path);
+                    resolve(cheminDestination);
+                }).catch((error) => {
+                    reject(`Erreur lors du déplacement du fichier : ${error}`);
+                });
+
+            }).catch((e)=>{
+                if (e.code == "EEXIST") {
+
+                    const cheminDestination = path.join('public/images/user/user_' + id_user + '/profil', file.filename);
+                    // Déplacer le fichier vers le dossier de destination
+                    fs.cp(file.path, cheminDestination).then(() => {
+                        fs.rm(file.path);
+                        resolve(cheminDestination);
+                    }).catch((error) => {
+                        reject(`Erreur lors du déplacement du fichier : ${error}`);
+                    });
+
+                }else{
+                    reject(`Erreur lors de la création du dossier de destination : ${e}`);
+                }
+            });  
+        });
     }
 
 

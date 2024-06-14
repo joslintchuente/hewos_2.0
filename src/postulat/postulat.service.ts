@@ -7,6 +7,10 @@ import { Offre } from 'src/offer/offer.entity';
 import { OfferService } from 'src/offer/offer.service';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
+import { Question } from 'src/question/question.entity';
+import { QuestionService } from 'src/question/question.service';
+import { Reponse_question } from 'src/reponse_question/reponse_question.entity';
+import { Reponse_questionService } from 'src/reponse_question/reponse_question.service';
 
 @Injectable()
 export class PostulatService {
@@ -18,7 +22,11 @@ export class PostulatService {
         @InjectRepository(Offre)
         private offreRepository: Repository<Offre>,
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
+        @InjectRepository(Question)
+        private questionRepository: Repository<Question>,
+        @InjectRepository(Reponse_question)
+        private reponseRepository: Repository<Reponse_question>
     ) {}
 
     findAll(): Promise<Postulat[]> {
@@ -76,6 +84,28 @@ export class PostulatService {
                 });
             }else{
                 // Pour le cas de reponse aux questions
+                let questService:QuestionService = new QuestionService(this.questionRepository);
+                let repService:Reponse_questionService = new Reponse_questionService(this.reponseRepository);
+                await this.postulatRepository.insert(PostulatObject).catch((e)=>{
+                    throw e;
+                });
+                await questService.findMany(body.id_offre).then((result)=>{
+                    let reponses:string[] = [];
+                    reponses = body.reponses.split('*');
+                    
+                    if(reponses.length == result[1]){
+                        let i = 0;
+                        for(let elt in reponses){
+                            repService.insertOne(body,reponses[i],result[0][i]);
+                            i++;
+                        }
+                    }else{
+                        throw new Error("Nombre de reponses excede le nombre limite "+reponses.length+'>'+result[1]);
+                    }
+                });
+                await offservice.updatePostulants(body).catch((e)=>{
+                    throw e;
+                });
             }
             
         }

@@ -6,6 +6,7 @@ import { CronTime } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { userDto } from './user/userDto';
 import { userDto2 } from './user/userDto2';
+import { userDto3 } from './user/userDto3';
 import { ValidationPipe } from '@nestjs/common';
 import { UserService } from './user/user.service';
 import { AuthService } from './authentication/auth.service';
@@ -21,6 +22,7 @@ import { commentaireDto2 } from './commentaire/commentaireDto2';
 import { CommentaireService } from './commentaire/commentaire.service';
 import { postulatDto } from './postulat/postulatDto';
 import { postulatDto2 } from './postulat/postulatDto2';
+import { postulatDto3 } from './postulat/postulatDto3';
 import { PostulatService } from './postulat/postulat.service';
 import { abonnementDto } from './abonnement/abonnementDto';
 import { AbonnementService } from './abonnement/abonnement.service';
@@ -213,34 +215,6 @@ export class AppController {
 
   }
 
-/*
-  TODO : 
-      - afficher les publications
-      - les trier (nombre limite de pub , algorithme de recommandation, Hazard , facteur anciennete  )
-      - Envoie de notifications de publications, de messages, de postes , likes , commentaires , d'evenements*/
-      /*
-  
-  @Sse('publications')
-  @UseInterceptors(AuthInterceptor)
-  sse(): Observable<MessageEvent> {
-    let offServ = this.offerService;
-    let selCri : SelectionCriteria; 
-    const observable = new Observable(function subscribe(subscriber) {
-      
-      try {
-        //listing of criteria to match
-        //selCri.
-        offServ.findOne();
-        subscriber.next(1);
-        subscriber.next(2);
-        subscriber.next(3);
-        subscriber.complete();
-      } catch (err) {
-        subscriber.error(err); // delivers an error if it caught one
-      }
-    });
-  }*/
-  
   @Get('publications')
   @UseInterceptors(AuthInterceptor)
   async send_publications(@Body(new ValidationPipe()) reqst, @Res() res : Response){
@@ -365,6 +339,69 @@ export class AppController {
       
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message : "Echec de mis a jour du profil : "+e
+      });
+    });
+  }
+
+  @Put('modifier_photo')
+  @UseInterceptors(
+    FileInterceptor('photo',{
+      storage : diskStorage({
+        destination : function (req, file, cb) {
+          cb(null, './public/images/temp')
+        },
+        filename : (req,file,cb) => {
+          cb(null, ''+Date.now()+'_'+file.originalname)
+        }
+      })
+    }),
+    AuthInterceptor
+  )
+  async modifier_photo(@UploadedFile() file: Express.Multer.File, @Body(new ValidationPipe()) body:userDto3, @Res() res : Response){
+    this.userService.update_image(body,file).then(()=>{
+      this.userService.storage_image(file,body.id_user).catch((e)=>{
+        console.error(e);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message : 'Erreur lors de la reception des images :' + e
+        });
+      });
+
+      res.status(HttpStatus.CREATED).json({
+        message: "mise  a jour de la photo de profil reussie !"
+      });
+    }).catch((e)=>{
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Erreur lors de la mise a jour de la photo de profil: "+e
+      });
+    });
+  }
+
+  @Put('selection_postulant')
+  @UseInterceptors(AuthInterceptor)
+  async selectionner( @Body(new ValidationPipe()) body:postulatDto3, @Res() res : Response){
+    this.offerService.updatePostulant(body).then(()=>{
+      res.status(HttpStatus.ACCEPTED).json({
+        message: 'selection du postulant reussie !'
+      });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Echec de selection de postulant : "+e
+      });
+    });
+  }
+
+  @Post('deconnexion')
+  @UseInterceptors(AuthInterceptor)
+  async deconnexion(@Body(new ValidationPipe()) body, @Res() res : Response){
+    this.authService.logOut(body.token).then((re)=>{
+      res.status(HttpStatus.ACCEPTED).json({
+        message: 'Deconnexion reussie !'
+      });
+    }).catch((e)=>{
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message : "Echec de deconnexion : "+e
       });
     });
   }

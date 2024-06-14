@@ -53,8 +53,8 @@ export class userDto{
     @IsNotEmpty()
     date_naissance: Date;
 
-    @IsNotEmpty()
+
     @IsOptional()
-    photo?: string;
+    photo?: any;
 
 }

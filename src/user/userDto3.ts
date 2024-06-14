@@ -1,20 +1,17 @@
 
 import { IsOptional,IsString, IsInt , IsPhoneNumber, IsEmail, IsStrongPassword, MaxLength, MinLength, IsDate, IsNotEmpty, IsNumberString, IsDateString } from 'class-validator';
+import { IsCustomDateFormat } from 'src/validation/CustomDateFormat';
 
-export class postulatDto{
+export class userDto3{
 
     @IsInt()
     id_user: number;
-
-    @IsNumberString()
-    id_offre: number;
-
+    
     @IsString()
     @IsNotEmpty()
     token : string;
 
-    @IsString()
-    @IsOptional()
-    reponses ?: string;
+    @IsNotEmpty()
+    photo: any;
 
 }

@@ -48,7 +48,7 @@ export class OfferService {
         OfferObject.mode = offerdto.mode;
         OfferObject.delai = offerdto.delai;
         OfferObject.photo_post = photo.filename;
-        //OfferObject.questions = offerdto.questions;
+        OfferObject.statut_offre = "disponible";
         OfferObject.date_publication= new Date();
         
         
@@ -128,6 +128,17 @@ export class OfferService {
         let offres = await this.findOne({id_offre:body.id_offre});
         
         return this.offerRepository.update(body.id_offre , {postulants : offres.postulants + 1 });
+        
+        
+    }
+    async updatePostulant(@Body() body :any):Promise<UpdateResult>{
+        
+        
+        return this.offerRepository.update(body.id_offre , {
+            id_postulant : body.id_postulant,
+            date_acquisition: new Date(),
+            statut_offre: "indisponible"
+        });
         
         
     }

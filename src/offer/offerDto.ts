@@ -1,5 +1,5 @@
 
-import { IsString, IsInt , IsPhoneNumber, IsEmail, IsStrongPassword, MaxLength, MinLength, IsDate, IsNotEmpty, IsNumberString, IsDateString } from 'class-validator';
+import {IsOptional, IsString, IsInt , IsPhoneNumber, IsEmail, IsStrongPassword, MaxLength, MinLength, IsDate, IsNotEmpty, IsNumberString, IsDateString } from 'class-validator';
 import { IsCustomDateFormat } from 'src/validation/CustomDateFormat';
 
 export class offerDto{
@@ -31,8 +31,8 @@ export class offerDto{
     @IsCustomDateFormat()
     delai: Date;
 
-    
-    photo?: File;
+    @IsOptional()
+    photo?: any;
 
     @IsString()
     @MinLength(3)

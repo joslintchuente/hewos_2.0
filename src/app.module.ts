@@ -27,6 +27,9 @@ import { PostulatModule } from './postulat/postulat.module';
 import { Abonnement } from './abonnement/abonnement.entity';
 import { AbonnementService } from './abonnement/abonnement.service';
 import { AbonnementModule } from './abonnement/abonnement.module';
+import { Reponse_question } from './reponse_question/reponse_question.entity';
+import { Reponse_questionService } from './reponse_question/reponse_question.service';
+import { Reponse_questionModule } from './reponse_question/reponse_question.module';
 import { LoggerMiddleware } from './middleware/Logger.Middleware';
 
 
@@ -42,7 +45,7 @@ import { LoggerMiddleware } from './middleware/Logger.Middleware';
       username: 'root',
       password: process.env.PASSWORD,
       database: 'hewos',
-      entities: [OTP,User,Offer,Question,Commentaire,Postulat,Abonnement],
+      entities: [OTP,User,Offer,Question,Commentaire,Postulat,Abonnement,Reponse_question],
       synchronize: Boolean(process.env.SYNCHRONIZE_DEV),
       
     }),
@@ -53,10 +56,11 @@ import { LoggerMiddleware } from './middleware/Logger.Middleware';
     QuestionModule,
     CommentaireModule,
     PostulatModule,
-    AbonnementModule
+    AbonnementModule,
+    Reponse_questionModule
   ],
   controllers: [AppController],
-  providers: [AppService,OtpService,AuthService,UserModule,UserService,JwtService,OfferService,QuestionService,CommentaireService,PostulatService,AbonnementService],
+  providers: [AppService,OtpService,AuthService,UserModule,UserService,JwtService,OfferService,QuestionService,CommentaireService,PostulatService,AbonnementService,Reponse_questionService],
 })
 export class AppModule implements NestModule  {
   constructor(private dataSource: DataSource) {}

@@ -42,6 +42,15 @@ export class Offre {
 
     @Column()
     postulants?: number;
+
+    @Column()
+    id_postulant?: number;
+
+    @CreateDateColumn()
+    date_acquisition?: Date;
+
+    @Column()
+    statut_offre?:string;
     
 
 

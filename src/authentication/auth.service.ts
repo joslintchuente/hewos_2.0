@@ -41,6 +41,28 @@ export class AuthService {
     return await this.jwtService.signAsync(payload,{expiresIn: '24h',privateKey: JWT_SIGN_SECRET});
   }
 
+  async logOut(token:string){
+    
+    const options: JwtVerifyOptions = {
+      secret: JWT_SIGN_SECRET,
+    };
+
+    // Déchiffrement du token
+    const decoded = this.jwtService.verify(token,options);
+
+    // Si le token est valide, on le désactive en modifiant son contenu
+    if (decoded) {
+      // On peut ajouter une clé supplémentaire pour indiquer que le token est désactivé
+      decoded.isInvalidated = true;
+      const newToken = this.jwtService.signAsync({date:new Date()},{expiresIn: '1h',privateKey: "desactivation"});
+
+      return true;
+    } else {
+      // Si le token est invalide, on le retourne tel quel
+      return true;
+    }
+  }
+
   
   
   
